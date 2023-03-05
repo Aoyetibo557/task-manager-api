@@ -1,0 +1,32 @@
+{
+  "name": "taskmanagerapi",
+  "version": "1.0.0",
+  "description": "Node.js Rest Apis with Express, Sequelize and MySql",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sequelize",
+    "mysql",
+    "rest",
+    "api"
+  ],
+  "author": "Anu",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "firebase-admin": "^11.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^2.0.16"
+  },
+  "engines": {
+    "node": "14.15.1"
+  }
+}
