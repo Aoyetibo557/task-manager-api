@@ -1,6 +1,7 @@
 
 # ignore the env variable file
 /node_modules/
+**/node_modules
 .env
 
 

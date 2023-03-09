@@ -8,20 +8,20 @@ const userRoutes = require("./routes/auth.routes");
 const app = express();
 
 var corsOption = {
-  origin: ["http://localhost:9090", "http://localhost:3000",]
+  origin: ["http://localhost:9090", "http://localhost:3000"],
   credentials: true,
   optionSuccessStatus: 200,
 };
 
-// app.use(cors(corsOption));
+app.use(cors(corsOption));
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware that lifts the cors restriction for routing from a diffrent url to the server url
-// app.use(function (req, res, next) {
-  // res.setHeader("Access-Control-Allow-origin", "*");
-  // next();
-// });
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-origin", "*");
+  next();
+});
 
 // simple route
 app.get("/", (req, res) => {
@@ -34,7 +34,6 @@ app.use("/api", controllers);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/auth", userRoutes);
-
 
 const PORT = process.env.PORT || 9090;
 
@@ -50,4 +49,4 @@ app.listen(PORT, () => {
 //   console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
 // }
 
-// module.exports = app;
+module.exports = app;
