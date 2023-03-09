@@ -1,3 +1,7 @@
 
 # ignore the env variable file
+/node_modules/
 .env
+
+
+// "use": "@now/node"
