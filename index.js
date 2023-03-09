@@ -44,4 +44,4 @@ app.listen(PORT, () => {
 //   console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
 // }
 
-module.exports = app;
+// module.exports = app;
