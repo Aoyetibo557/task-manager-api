@@ -4,10 +4,10 @@
   "description": "Node.js Rest Apis with Express and firebase",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "build": "node index.js",
-    "dev": "nodemon index.js"
+    "start-dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "nodejs",
@@ -27,8 +27,5 @@
     "firebase-admin": "^11.5.0",
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.16"
-  },
-  "engines": {
-    "node": "14.x"
   }
 }
