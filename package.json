@@ -1,7 +1,7 @@
 {
   "name": "taskmanagerapi",
   "version": "1.0.0",
-  "description": "Node.js Rest Apis with Express, Sequelize and MySql",
+  "description": "Node.js Rest Apis with Express and firebase",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,6 +27,6 @@
     "nodemon": "^2.0.16"
   },
   "engines": {
-    "node": "14.x"
+    "node": "14.15.1"
   }
 }
