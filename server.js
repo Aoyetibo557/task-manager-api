@@ -37,4 +37,5 @@ if (PORT) {
 } else {
   console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
 }
-("C:UsersaoyetDesktopPersonal Programs\task manager\firebaseservicekey.json");
+
+module.exports = app;
