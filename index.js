@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
 // simple route
 app.get("/", (req, res) => {
   const message =
-    "Welcome to Tasskker's REST API. To get started, please visit /api/{route} to see the API's endpoints.";
+    "Welcome to Tassker's REST API. To get started, please visit /api/{controller}/{route} to see the API's endpoints.";
   res.json({ message: message });
 });
 
