@@ -2,10 +2,10 @@
   "name": "taskmanagerapi",
   "version": "1.0.0",
   "description": "Node.js Rest Apis with Express, Sequelize and MySql",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "keywords": [
     "nodejs",
