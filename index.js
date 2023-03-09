@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const controllers = require("./controllers/index");
+const taskRoutes = require("./routes/task.routes");
+const boardRoutes = require("./routes/board.routes");
+const userRoutes = require("./routes/auth.routes");
 
 const app = express();
 
 var corsOption = {
-  origin: "http://localhost:9090",
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:9090", "http://localhost:3000",]
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -29,6 +31,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", controllers);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/boards", boardRoutes);
+app.use("/api/auth", userRoutes);
+
 
 const PORT = process.env.PORT || 9090;
 
