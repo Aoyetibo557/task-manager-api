@@ -1,4 +1,5 @@
 const { db } = require("../services/useAuth.js");
+const dayjs = require("dayjs");
 
 async function createTask(req, res) {
   // Validate request
@@ -17,6 +18,8 @@ async function createTask(req, res) {
     boardId,
     userId,
     category: "active",
+    timestamp: dayjs().unix(),
+    pinned: false,
   };
 
   const docRef = await db.collection("tasks").add(newTask);
@@ -50,6 +53,37 @@ async function getBoardTasks(req, res) {
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("boardId", "==", boardid)
+    .where("category", "==", "active")
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
+// get all the tasks for a user
+async function getUserTasks(req, res) {
+  const { userid } = req.params;
+
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
     .where("category", "==", "active")
     .get();
 
@@ -214,12 +248,151 @@ async function getArchivedTasks(req, res) {
   });
 }
 
+// get the 4 most recent tasks for the collection tasks that have the category of active and are for the user.
+// if the tasks are not up  to 4, then return all the tasks for the user that are active and recent based off the timestamp (unix time)
+// it should return an array of objects with the task id and the task data, and using the board id, get the board name and add it to the task object that will be returned
+async function getRecentTasks(req, res) {
+  const { userid } = req.params;
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
+    .where("category", "==", "active")
+    .orderBy("timestamp", "asc")
+    .limit(6)
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  // get the board name for each task
+  const boardRef = db.collection("boards");
+  const boardSnapshot = await boardRef.get();
+
+  if (boardSnapshot.empty) {
+    return res.send({
+      message: "No boards found!",
+      status: "error",
+    });
+  }
+
+  boardSnapshot.forEach((doc) => {
+    const boardId = doc.id;
+    const board = doc.data();
+
+    tasks.forEach((task) => {
+      if (task.boardId === boardId) {
+        task.boardName = board.name;
+      }
+    });
+  });
+
+  res.status(200).json({
+    message: "Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
+// pin a task
+async function pinTask(req, res) {
+  const { taskid } = req.params;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({ pinned: true });
+
+  res.status(200).json({
+    message: "Task pinned successfully!",
+    status: "success",
+  });
+}
+
+// unpin a task
+async function unpinTask(req, res) {
+  const { taskid } = req.params;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({ pinned: false });
+
+  res.status(200).json({
+    message: "Task unpinned successfully!",
+    status: "success",
+  });
+}
+
+// get pinned tasks
+async function getPinnedTasks(req, res) {
+  const { userid } = req.params;
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
+    .where("category", "==", "active")
+    .where("pinned", "==", true)
+    .orderBy("timestamp", "desc")
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
 module.exports = {
   createTask,
   getBoardTasks,
+  getUserTasks,
   updateTask,
   deleteTask,
   updateTaskStatus,
   archiveTask,
   getArchivedTasks,
+  getRecentTasks,
+  pinTask,
+  unpinTask,
+  getPinnedTasks,
 };

@@ -85,7 +85,7 @@ async function getUserBoards(req, res) {
     boards.push(newData);
   });
 
-  res.send({
+  res.status(200).json({
     message: "Boards fetched successfully!",
     status: "success",
     boards: boards,

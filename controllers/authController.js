@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const dayjs = require("dayjs");
 
 const { db, admin } = require("../services/useAuth.js");
 
@@ -34,6 +35,13 @@ async function signup(req, res) {
         password: hash,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
+        language: req.body.language || "en",
+        country: req.body.country || "",
+        phone: req.body.phone || "",
+        username: req.body.username || "",
+        bio: req.body.bio || "",
+        timestamp: dayjs().unix(),
+        tourtaken: false,
       };
 
       const userRecord = await admin.auth().createUser(newUser);
@@ -79,7 +87,7 @@ async function login(req, res) {
     .get();
 
   if (userSnapshot.empty) {
-    return res.status(401).json({ message: "Invalid email or password" });
+    return res.send({ message: "Invalid email or password", status: "error" });
   }
 
   const userDoc = userSnapshot.docs[0];
@@ -90,9 +98,7 @@ async function login(req, res) {
   const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) {
-    return res
-      .status(401)
-      .json({ message: "Invalid email or password", status: "error" });
+    return res.json({ message: "Invalid email or password", status: "error" });
   }
 
   const token = jwt.sign({ uid: userDoc.id }, "secret", {
@@ -139,10 +145,11 @@ async function getUserDataByEmail(email) {
 async function findUserByEmail(req, res) {
   const email = req.params.email || req.body.email;
 
-  const user = await getUserDataByEmail(email);
+  const userRec = await getUserDataByEmail(email);
   if (
-    !user ||
-    user === "There is no user record corresponding to the provided identifier."
+    !userRec ||
+    userRec ===
+      "There is no user record corresponding to the provided identifier."
   ) {
     return res.send({
       message: "User not found with email",
@@ -153,7 +160,29 @@ async function findUserByEmail(req, res) {
 
   return res.status(200).json({
     message: "User found successfully!",
-    user: user,
+    status: "success",
+    user: userRec,
+  });
+}
+
+// find a single user by userid
+async function findUserById(req, res) {
+  const userid = req.params.userid || req.body.userid;
+
+  const user = await db.collection("users").doc(userid).get();
+
+  if (!user.exists) {
+    return res.send({
+      message: "User not found with id",
+      userid: userid,
+      status: "error",
+    });
+  }
+
+  return res.status(200).json({
+    message: "User found successfully!",
+    status: "success",
+    user: user.data(),
   });
 }
 
@@ -180,9 +209,41 @@ async function updateUserByEmail(req, res) {
   }
 }
 
+// update user profile/or any other field by userid
+async function updateUserById(req, res) {
+  const userid = req.params.userid || req.body.userid;
+  const data = req.body;
+
+  // Check if user with provided userId exists in Firestore
+  const isUser = await db.collection("users").doc(userid).get();
+
+  if (!isUser.exists) {
+    return res.send({ message: "User not found", status: "error" });
+  }
+
+  // Update user document with provided data, then get the updated document
+  try {
+    await db.collection("users").doc(userid).update(data);
+    const user = await db.collection("users").doc(userid).get();
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      status: "success",
+      user: user.data(),
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal server error" });
+  }
+}
+
 module.exports = {
   signup,
   login,
   findUserByEmail,
   updateUserByEmail,
+  findUserById,
+  updateUserById,
 };
