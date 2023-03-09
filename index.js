@@ -4,6 +4,7 @@ const controllers = require("./controllers/index");
 const taskRoutes = require("./routes/task.routes");
 const boardRoutes = require("./routes/board.routes");
 const userRoutes = require("./routes/auth.routes");
+require("dotenv").config();
 
 const app = express();
 
