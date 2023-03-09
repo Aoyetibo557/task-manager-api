@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const controllers = require("./controllers/index");
 
 const app = express();
 
@@ -27,15 +28,20 @@ app.get("/", (req, res) => {
   res.json({ message: message });
 });
 
-app.use("/api", require("./controllers"));
+app.use("/api", controllers);
 
 const PORT = process.env.PORT || 9090;
-if (PORT) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
-  });
-} else {
-  console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
-}
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
+
+// if (PORT) {
+//   app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}.`);
+//   });
+// } else {
+//   console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
+// }
 
 module.exports = app;
