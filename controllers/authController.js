@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dayjs = require("dayjs");
+const uuid = require("uuid");
 
-const { db, admin } = require("../services/useAuth.js");
+const { db, admin, ref, storage } = require("../services/useAuth.js");
 
 async function signup(req, res) {
   // Validate request
