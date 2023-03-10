@@ -10,8 +10,8 @@ const app = express();
 
 var corsOption = {
   origin: [
-    "https://task-manager-api-dun.vercel.app/",
-    "https://task-manager-client-nu.vercel.app/",
+    "https://task-manager-api-dun.vercel.app",
+    "https://task-manager-client-nu.vercel.app",
     "http://localhost:9090",
     "http://localhost:3000",
   ],
