@@ -115,6 +115,7 @@ async function updateTask(req, res) {
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!",
+      status: "error",
     });
 
     return;
@@ -122,6 +123,8 @@ async function updateTask(req, res) {
 
   // the data could be anything in the body, so we need to get the data from the body
   const data = req.body;
+
+  console.log("data", data);
 
   const taskRef = db.collection("tasks").doc(taskid);
   const taskData = await taskRef.get();

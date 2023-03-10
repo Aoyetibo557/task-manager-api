@@ -9,7 +9,11 @@ require("dotenv").config();
 const app = express();
 
 var corsOption = {
-  origin: ["http://localhost:9090", "http://localhost:3000"],
+  origin: [
+    "https://task-manager-api-dun.vercel.app/",
+    "http://localhost:9090",
+    "http://localhost:3000",
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };

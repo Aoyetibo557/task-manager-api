@@ -33,4 +33,4 @@ use the following controller id's to access the different api routes and endpoin
 
 This app is currently deployed on [Vercel](https://vercel.com/).
 
-The live version can be found [here](https://task-manager-frontend.vercel.app/).
+The live version can be found [https://task-manager-api-dun.vercel.app/](https://task-manager-api-dun.vercel.app/).
