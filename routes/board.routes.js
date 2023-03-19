@@ -13,4 +13,7 @@ router.get("/getboard/:name", board.getBoardByName);
 //  get user boards
 router.get("/getuserboards/:userid", board.getUserBoards);
 
+// clear tasks on a board
+router.put("/cleartasks/:boardId", board.clearBoardTasks);
+
 module.exports = router;

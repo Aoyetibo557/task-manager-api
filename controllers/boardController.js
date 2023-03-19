@@ -73,9 +73,11 @@ async function getUserBoards(req, res) {
   const snapshot = await boardRef.where("userid", "==", userid).get();
 
   if (snapshot.empty) {
-    return {
-      name: "",
-    };
+    res.send({
+      message: "No boards found!",
+      status: "error",
+    });
+    return;
   }
 
   let boards = [];
@@ -92,8 +94,69 @@ async function getUserBoards(req, res) {
   });
 }
 
+// clear tasks on a board, all the tasks with that boardId, thier category will be set to deleted
+async function clearBoardTasks(req, res) {
+  const { boardId } = req.params;
+  console.log("boardId", boardId);
+
+  // if the user is not logged in ot the userid is not provided return an error
+  if (!boardId) {
+    res.send({
+      message: "No boardId provided!",
+      status: "error",
+    });
+    return;
+  }
+
+  const tasksRef = db.collection("tasks");
+  const snapshot = await tasksRef.where("boardId", "==", boardId).get();
+
+  console.log("snapshot", snapshot.empty);
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+    return;
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const newData = doc.data();
+    newData.id = doc.id;
+    tasks.push(newData);
+  });
+
+  // if the tasks are found and are already deleted, return a message
+  if (tasks.every((task) => task.category === "deleted")) {
+    res.send({
+      message: "Board is empty!",
+      status: "error",
+    });
+    return;
+  }
+
+  // update the tasks
+  tasks.forEach(async (task) => {
+    const { id, ...rest } = task;
+    const updatedTask = {
+      ...rest,
+      category: "deleted",
+    };
+    await db.collection("tasks").doc(id).update(updatedTask);
+  });
+
+  res.status(200).json({
+    message: "Tasks cleared successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
 module.exports = {
   createBoard,
   getBoardByName,
   getUserBoards,
+  clearBoardTasks,
 };
