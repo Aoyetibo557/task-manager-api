@@ -42,6 +42,7 @@ async function createBoard(req, res) {
   const newBoard = {
     name,
     userid,
+    boardstatus: "active",
   };
 
   const docRef = await db.collection("boards").add(newBoard);
@@ -70,7 +71,10 @@ async function getUserBoards(req, res) {
   }
 
   const boardRef = db.collection("boards");
-  const snapshot = await boardRef.where("userid", "==", userid).get();
+  const snapshot = await boardRef
+    .where("userid", "==", userid)
+    .where("boardstatus", "==", "active")
+    .get();
 
   if (snapshot.empty) {
     res.send({
@@ -154,9 +158,94 @@ async function clearBoardTasks(req, res) {
   });
 }
 
+// delete a board, set the boardstatus to deleted
+async function deleteBoard(req, res) {
+  const { boardId } = req.params;
+
+  // if the user is not logged in ot the userid is not provided return an error
+  if (!boardId) {
+    res.send({
+      message: "No boardId provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  const boardRef = db.collection("boards").doc(boardId);
+  const snapshot = await boardRef.get();
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No board found!",
+      status: "error",
+    });
+    return;
+  }
+
+  const board = snapshot.data();
+
+  // if the board is already deleted, return a message
+  if (board.boardstatus === "deleted") {
+    res.send({
+      message: "Board is already deleted!",
+      status: "error",
+    });
+    return;
+  }
+
+  // update the board
+  const updatedBoard = {
+    ...board,
+    boardstatus: "deleted",
+  };
+
+  // clear the tasks on the board
+  const tasksRef = db.collection("tasks");
+  const tasksSnapshot = await tasksRef.where("boardId", "==", boardId).get();
+
+  if (!tasksSnapshot.empty) {
+    let tasks = [];
+    tasksSnapshot.forEach((doc) => {
+      const newData = doc.data();
+      newData.id = doc.id;
+      tasks.push(newData);
+    });
+
+    // if the tasks are found and are already deleted, return a message
+    if (tasks.every((task) => task.category === "deleted")) {
+      res.send({
+        message: "Board is empty!",
+        status: "error",
+      });
+      return;
+    }
+
+    // update the tasks
+    tasks.forEach(async (task) => {
+      const { id, ...rest } = task;
+      const updatedTask = {
+        ...rest,
+        category: "deleted",
+      };
+
+      await db.collection("tasks").doc(id).update(updatedTask);
+    });
+  }
+
+  await db.collection("boards").doc(boardId).update(updatedBoard);
+
+  res.status(200).json({
+    message: "Board deleted successfully!",
+    status: "success",
+    board: updatedBoard,
+  });
+}
+
 module.exports = {
   createBoard,
   getBoardByName,
   getUserBoards,
   clearBoardTasks,
+  deleteBoard,
 };
