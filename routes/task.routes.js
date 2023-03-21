@@ -23,7 +23,10 @@ router.put("/updatetaskstatus/:taskid", task.updateTaskStatus);
 router.put("/archivetask/:taskid", task.archiveTask);
 
 // get all archived tasks for a board
-router.get("/getarchivedtasks/:boardid", task.getArchivedTasks);
+router.get("/getboardarchivedtasks/:boardid", task.getBoardArchivedTasks);
+
+// get all archived tasks for a user
+router.get("/getuserarchivedtasks/:userid", task.getUserArchivedTasks);
 
 // get recent tasks for a user
 router.get("/getrecenttasks/:userid", task.getRecentTasks);

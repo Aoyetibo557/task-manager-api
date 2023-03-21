@@ -222,7 +222,7 @@ async function archiveTask(req, res) {
 }
 
 // get all archived tasks for a board
-async function getArchivedTasks(req, res) {
+async function getBoardArchivedTasks(req, res) {
   const { boardid } = req.params;
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
@@ -242,6 +242,62 @@ async function getArchivedTasks(req, res) {
     const taskId = doc.id;
     const task = doc.data();
     tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
+// get all archived tasks for a user
+async function getUserArchivedTasks(req, res) {
+  const { userid } = req.params;
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
+    .where("category", "==", "archived")
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  // get the board name for each task and add it to the task object
+  const boardRef = db.collection("boards");
+  const boardSnapshot = await boardRef.get();
+
+  if (boardSnapshot.empty) {
+    return res.send({
+      message: "No boards found!",
+      status: "error",
+    });
+  }
+
+  let boards = [];
+  boardSnapshot.forEach((doc) => {
+    const boardId = doc.id;
+    const board = doc.data();
+    boards.push({ boardId, ...board });
+  });
+
+  tasks.forEach((task) => {
+    boards.forEach((board) => {
+      if (task.boardId === board.boardId) {
+        task.boardName = board.name;
+      }
+    });
   });
 
   res.status(200).json({
@@ -393,7 +449,8 @@ module.exports = {
   deleteTask,
   updateTaskStatus,
   archiveTask,
-  getArchivedTasks,
+  getBoardArchivedTasks,
+  getUserArchivedTasks,
   getRecentTasks,
   pinTask,
   unpinTask,
