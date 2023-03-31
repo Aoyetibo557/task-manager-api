@@ -213,13 +213,13 @@ async function deleteBoard(req, res) {
     });
 
     // if the tasks are found and are already deleted, return a message
-    if (tasks.every((task) => task.category === "deleted")) {
-      res.send({
-        message: "Board is empty!",
-        status: "error",
-      });
-      return;
-    }
+    // if (tasks.every((task) => task.category === "deleted")) {
+    //   res.send({
+    //     message: "Board is empty!",
+    //     status: "error",
+    //   });
+    //   // return;
+    // }
 
     // update the tasks
     tasks.forEach(async (task) => {

@@ -54,7 +54,7 @@ async function signup(req, res) {
 
       const { password: _, ...newRec } = userData.data();
 
-      await docRef.update({ uid: userDocId });
+      await docRef.update({ userid: userDocId });
 
       newRec.userid = userDocId;
 
@@ -78,13 +78,14 @@ async function signup(req, res) {
 }
 
 async function login(req, res) {
-  const email = req.body.email;
+  const emailorusername = req.body.email || req.body.username;
   const password = req.body.password;
 
   // Check if user with provided email exists in Firestore
   const userSnapshot = await db
     .collection("users")
-    .where("email", "==", email)
+    .where("email", "==", emailorusername)
+    .limit(1)
     .get();
 
   if (userSnapshot.empty) {
@@ -94,6 +95,14 @@ async function login(req, res) {
   const userDoc = userSnapshot.docs[0];
   const user = userDoc.data();
   const userid = userDoc.id;
+
+  // check if the account is disabled/deleted, if isDeleted is true, then the account is disabled/deleted
+  if (user.isDeleted) {
+    return res.send({
+      message: "Your account has been disabled. Please contact support.",
+      status: "error",
+    });
+  }
 
   // Compare provided password with hashed password stored in Firestore
   const passwordMatch = await bcrypt.compare(password, user.password);
@@ -240,6 +249,51 @@ async function updateUserById(req, res) {
   }
 }
 
+// reset password by userid
+async function resetPassword(req, res) {
+  const userid = req.params.userid || req.body.userid;
+  const data = req.body;
+
+  // Check if user with provided userId exists in Firestore
+  const isUser = await db.collection("users").doc(userid).get();
+
+  if (!isUser.exists) {
+    return res.send({ message: "User not found", status: "error" });
+  }
+
+  // decrypt the password in the document and compare with the new password provided
+  const user = isUser.data();
+  const passwordMatch = await bcrypt.compare(data.password, user.password);
+
+  if (passwordMatch) {
+    return res.send({
+      message: "New password cannot be the same as the old password",
+      status: "error",
+    });
+  }
+
+  // encrypt the new password and update the document
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(data.password, salt);
+
+  try {
+    await db
+      .collection("users")
+      .doc(userid)
+      .update({ password: hashedPassword });
+    return res.send({
+      message: "Password updated successfully",
+      status: "success",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.send({
+      message: error.message || "Internal server error",
+      status: "error",
+    });
+  }
+}
+
 module.exports = {
   signup,
   login,
@@ -247,4 +301,5 @@ module.exports = {
   updateUserByEmail,
   findUserById,
   updateUserById,
+  resetPassword,
 };
