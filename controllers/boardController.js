@@ -1,4 +1,5 @@
 const { db } = require("../services/useAuth.js");
+const nodeMailer = require("nodemailer");
 
 const getBoardByName = async (name) => {
   const boardRef = db.collection("boards");
@@ -43,6 +44,7 @@ async function createBoard(req, res) {
     name,
     userid,
     boardstatus: "active",
+    collaborators: [],
   };
 
   const docRef = await db.collection("boards").add(newBoard);
@@ -242,10 +244,213 @@ async function deleteBoard(req, res) {
   });
 }
 
+// new feature - a new field was added to the board, collaborators to store the userids of the users who have access to the board
+// the collaborators field is an array of strings
+// the collaborators field is empty by default
+// the collaborators field is updated when a user is added to the board
+// the collaborators field is updated when a user is removed from the board
+/**
+ * I want to add a new feature/endpoint that allows a user to add a collaborator to a board. That means, the user will be able to send invites to other users to collaborate on a board.
+ * and based on the user's response, the user will be added to the board's collaborators array.
+ *
+ */
+
+// add a collaborator to a board
+async function addCollaborator(req, res) {
+  const { boardId } = req.params;
+  const { userid } = req.body;
+
+  // if the user is not logged in ot the userid is not provided return an error
+  if (!boardId) {
+    res.send({
+      message: "No boardId provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  if (!userid) {
+    res.send({
+      message: "No userid provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  const boardRef = db.collection("boards").doc(boardId);
+  const snapshot = await boardRef.get();
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No board found!",
+      status: "error",
+    });
+    return;
+  }
+
+  const board = snapshot.data();
+
+  // if the board is already deleted, return a message
+  if (board.boardstatus === "deleted") {
+    res.send({
+      message: "Board is already deleted!",
+      status: "error",
+    });
+    return;
+  }
+
+  // update the board
+  const updatedBoard = {
+    ...board,
+    collaborators: [...board.collaborators, userid],
+  };
+
+  await db.collection("boards").doc(boardId).update(updatedBoard);
+
+  res.send({
+    message: "Collaborator added successfully!",
+    status: "success",
+    board: updatedBoard,
+  });
+}
+
+// remove a collaborator from a board
+async function removeCollaborator(req, res) {
+  const { boardId } = req.params;
+  const { userid } = req.body;
+
+  // if the user is not logged in ot the userid is not provided return an error
+  if (!boardId) {
+    res.send({
+      message: "No boardId provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  if (!userid) {
+    res.send({
+      message: "No userid provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  const boardRef = db.collection("boards").doc(boardId);
+  const snapshot = await boardRef.get();
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No board found!",
+      status: "error",
+    });
+    return;
+  }
+
+  const board = snapshot.data();
+
+  // if the board is already deleted, return a message
+  if (board.boardstatus === "deleted") {
+    res.send({
+      message: "Board is already deleted!",
+      status: "error",
+    });
+    return;
+  }
+
+  // update the board
+  const updatedBoard = {
+    ...board,
+    collaborators: board.collaborators.filter(
+      (collaborator) => collaborator !== userid
+    ),
+  };
+
+  await db.collection("boards").doc(boardId).update(updatedBoard);
+
+  res.send({
+    message: "Collaborator removed successfully!",
+    status: "success",
+    board: updatedBoard,
+  });
+}
+
+// get all the boards that a user is a collaborator on
+
+// send invites to users to collaborate on a board
+async function sendInvites(req, res) {
+  const { boardId } = req.params;
+  // the emails of the users to send invites to will be an array of strings
+  const { emails, senderemail } = req.body;
+
+  console.log(emails, senderemail, boardId);
+
+  // if the user is not logged in ot the emails are not provided return an error
+  if (!emails) {
+    res.send({
+      message: "No emails provided!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  // send the invites to the users using the email service
+  const message = {
+    // the emails of the users to send invites to will be an array of
+    to: emails.map((email) => email),
+    from: senderemail,
+    subject: `You have been invited to collaborate on a board by ${senderemail} on ${boardId}`,
+    text: `You have been invited to collaborate on a board by ${senderemail} on ${boardId}`,
+    html: `<strong>You have been invited to collaborate on a board ${senderemail} on ${boardId} </strong>`,
+  };
+
+  // try {
+  //   const transporter = nodeMailer.createTransport({
+  //     service: "gmail",
+  //     host: "smtp.gmail.com",
+  //     port: 587,
+  //     secure: false,
+  //     auth: {
+  //       user: process.env.EMAIL || senderemail,
+  //       pass: process.env.PASSWORD,
+  //   });
+
+  //   transporter.sendMail(message, (err, info) => {
+  //     if (err) {
+  //       console.log(err);
+  //       res.send({
+  //         message: "Error sending invites!",
+  //         status: "error",
+  //       });
+  //     } else {
+  //       console.log(info);
+  //       res.send({
+  //         message: "Invites sent successfully!",
+  //         status: "success",
+  //         info: info,
+  //       });
+  //     }
+  //   });
+  // } catch (err) {
+  //   res.send({
+  //     message: "Error sending invites!",
+  //     status: "error",
+  //   });
+  // }
+}
+
 module.exports = {
   createBoard,
   getBoardByName,
   getUserBoards,
   clearBoardTasks,
   deleteBoard,
+  addCollaborator,
+  removeCollaborator,
+  sendInvites,
 };
