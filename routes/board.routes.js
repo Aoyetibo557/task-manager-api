@@ -13,6 +13,9 @@ router.get("/getboard/:name", board.getBoardByName);
 //  get user boards
 router.get("/getuserboards/:userid", board.getUserBoards);
 
+// get board tasks count
+router.get("/getboardtaskscount/:boardId", board.getBoardTaskCount);
+
 // clear tasks on a board
 router.put("/cleartasks/:boardId", board.clearBoardTasks);
 

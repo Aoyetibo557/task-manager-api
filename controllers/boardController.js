@@ -93,10 +93,68 @@ async function getUserBoards(req, res) {
     boards.push(newData);
   });
 
+  // get the count of the tasks on a board
+  for (let i = 0; i < boards.length; i++) {
+    const tasksRef = db.collection("tasks");
+    const snapshot = await tasksRef
+      .where("boardId", "==", boards[i].id)
+      .where("category", "==", "active")
+      .get();
+
+    if (snapshot.empty) {
+      boards[i].taskCount = 0;
+      continue;
+    }
+
+    let count = 0;
+    snapshot.forEach((doc) => {
+      count++;
+    });
+
+    boards[i].taskCount = count;
+  }
+
   res.status(200).json({
     message: "Boards fetched successfully!",
     status: "success",
     boards: boards,
+  });
+}
+
+// get the count of the tasks on a board
+async function getBoardTaskCount(req, res) {
+  const { boardId } = req.params;
+
+  // if the user is not logged in ot the userid is not provided return an error
+  if (!boardId) {
+    res.send({
+      message: "No boardId provided!",
+      status: "error",
+    });
+    return;
+  }
+
+  const tasksRef = db.collection("tasks");
+  const snapshot = await tasksRef.where("boardId", "==", boardId).get();
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+    return;
+  }
+
+  // get the count of the tasks on a board
+  let count = 0;
+  snapshot.forEach((doc) => {
+    count++;
+  });
+
+  res.status(200).json({
+    message: "Tasks count fetched successfully!",
+    status: "success",
+    count: count,
   });
 }
 
@@ -448,6 +506,7 @@ module.exports = {
   createBoard,
   getBoardByName,
   getUserBoards,
+  getBoardTaskCount,
   clearBoardTasks,
   deleteBoard,
   addCollaborator,
