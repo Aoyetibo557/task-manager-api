@@ -24,4 +24,7 @@ router.put("/updateuserbyid/:userid", auth.updateUserById);
 // reset password by userid
 router.put("/resetpassword/:userid", auth.resetPassword);
 
+// get user stats
+router.get("/userstats/:userid", auth.getUserStats);
+
 module.exports = router;
