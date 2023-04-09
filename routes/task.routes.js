@@ -46,4 +46,7 @@ router.get("/getusertasks/:userid", task.getUserTasks);
 // getTasks
 router.get("/gettasks/:userid", task.getTasks);
 
+// star a task
+router.put("/startask/:taskid", task.starTask);
+
 module.exports = router;

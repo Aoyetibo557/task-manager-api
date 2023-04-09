@@ -294,21 +294,6 @@ async function resetPassword(req, res) {
   }
 }
 
-/**
- * Get user stats from Firestore
- * It accepts a user id as a parameter and return the following data
- * - total number of tasks
- * - total number of completed tasks
- * - total number of incomplete(todo) tasks
- * - total number of tasks due today (TBD)
- * - total number of task in progress
- * - total number of tasks overdue (TBD)
- * - total number of boards
- *
- * Kepp in mind that boards, task and users are in completely different collections and the identifiers are not the same
- * for tasks, the board id and user id are used to get the tasks
- * for boards, the user id is used to get the boards
- */
 async function getUserStats(req, res) {
   const { userid } = req.params;
 
@@ -349,8 +334,6 @@ async function getUserStats(req, res) {
   // get the counts for the userStats
   userStats.totalBoards = boards.docs.length;
   userStats.totalTasks = tasks.docs.length;
-
-  console.log(boards.docs.length);
 
   tasks.docs.forEach((task) => {
     const taskData = task.data();
