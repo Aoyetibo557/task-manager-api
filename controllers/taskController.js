@@ -483,6 +483,29 @@ async function getTasks(req, res) {
   });
 }
 
+// handle starring a task, it takes in the task id and the user id and a boolean value for starred, if the boolean value is true, then it'll star the task, if it's false, then it'll unstar the task
+async function starTask(req, res) {
+  const { taskid } = req.params;
+  const { isStarred } = req.body;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({ isStarred: isStarred });
+
+  res.status(200).json({
+    message: "Task starred successfully!",
+    status: "success",
+  });
+}
+
 module.exports = {
   createTask,
   getBoardTasks,
@@ -498,4 +521,5 @@ module.exports = {
   unpinTask,
   getPinnedTasks,
   getTasks,
+  starTask,
 };
