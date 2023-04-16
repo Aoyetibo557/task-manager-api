@@ -506,6 +506,39 @@ async function starTask(req, res) {
   });
 }
 
+// get deleted tasks. Deleted tasks are save like: category: "deleted", accepts userid for filter
+async function getDeletedTasks(req, res) {
+  const { userid } = req.params;
+
+  console.log("userId", userid);
+
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
+    .where("category", "==", "deleted")
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No Deleted tasks Found!",
+      status: "error",
+    });
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Deleted Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
 module.exports = {
   createTask,
   getBoardTasks,
@@ -522,4 +555,5 @@ module.exports = {
   getPinnedTasks,
   getTasks,
   starTask,
+  getDeletedTasks,
 };
