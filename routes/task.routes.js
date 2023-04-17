@@ -49,4 +49,7 @@ router.get("/gettasks/:userid", task.getTasks);
 // star a task
 router.put("/startask/:taskid", task.starTask);
 
+// get deleted tasks
+router.get("/getdeletedtasks/:userid", task.getDeletedTasks);
+
 module.exports = router;
