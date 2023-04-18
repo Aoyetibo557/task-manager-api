@@ -294,6 +294,70 @@ async function resetPassword(req, res) {
   }
 }
 
+async function getUserStats(req, res) {
+  const { userid } = req.params;
+
+  const user = await db.collection("users").doc(userid).get();
+
+  if (!user.exists) {
+    return res.send({
+      message: "User not found with id",
+      userid: userid,
+      status: "error",
+    });
+  }
+
+  const userStats = {
+    totalTasks: 0,
+    totalCompletedTasks: 0,
+    totalIncompleteTasks: 0,
+    totalTasksDueToday: 0,
+    totalTasksInProgress: 0,
+    totalTasksOverdue: 0,
+    totalBoards: 0,
+    totalPinnedTasks: 0,
+  };
+
+  // get all boards for the user
+  const boards = await db
+    .collection("boards")
+    .where("userid", "==", userid)
+    .where("boardstatus", "==", "active")
+    .get();
+
+  // get all tasks for the user
+  const tasks = await db
+    .collection("tasks")
+    .where("userId", "==", userid)
+    .get();
+
+  // get the counts for the userStats
+  userStats.totalBoards = boards.docs.length;
+  userStats.totalTasks = tasks.docs.length;
+
+  tasks.docs.forEach((task) => {
+    const taskData = task.data();
+    if (taskData.status === "done") {
+      userStats.totalCompletedTasks++;
+    }
+    if (taskData.status === "doing") {
+      userStats.totalTasksInProgress++;
+    }
+    if (taskData.status === "todo") {
+      userStats.totalIncompleteTasks++;
+    }
+    if (taskData.pinned === true) {
+      userStats.totalPinnedTasks++;
+    }
+  });
+
+  res.status(200).json({
+    message: "User stats found successfully!",
+    status: "success",
+    userStats: userStats,
+  });
+}
+
 module.exports = {
   signup,
   login,
@@ -302,4 +366,5 @@ module.exports = {
   findUserById,
   updateUserById,
   resetPassword,
+  getUserStats,
 };

@@ -43,4 +43,13 @@ router.get("/getpinnedtasks/:userid", task.getPinnedTasks);
 // get all tasks for a user
 router.get("/getusertasks/:userid", task.getUserTasks);
 
+// getTasks
+router.get("/gettasks/:userid", task.getTasks);
+
+// star a task
+router.put("/startask/:taskid", task.starTask);
+
+// get deleted tasks
+router.get("/getdeletedtasks/:userid", task.getDeletedTasks);
+
 module.exports = router;

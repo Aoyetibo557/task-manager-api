@@ -441,6 +441,104 @@ async function getPinnedTasks(req, res) {
   });
 }
 
+// get tasks, it'll take in a userid, filters(optional), and sort(optional), filters could be category={active, deleted or archived}, another filter could be pinned(boolean) ={true or false}
+async function getTasks(req, res) {
+  const { userid } = req.params;
+  const { filter, filterType } = req.query;
+
+  const taskRef = db.collection("tasks");
+  // let snapshot = await taskRef.where("userId", "==", userid).get();
+  let snapshot =
+    filterType === "pinned"
+      ? await taskRef
+          .where("userId", "==", userid)
+          .where("pinned", "==", filter)
+          .get()
+      : filterType === "category" &&
+        (await taskRef
+          .where("userId", "==", userid)
+          .where("category", "==", filter)
+          .get());
+
+  if (snapshot.empty) {
+    res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+
+    return;
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
+// handle starring a task, it takes in the task id and the user id and a boolean value for starred, if the boolean value is true, then it'll star the task, if it's false, then it'll unstar the task
+async function starTask(req, res) {
+  const { taskid } = req.params;
+  const { isStarred } = req.body;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({ isStarred: isStarred });
+
+  res.status(200).json({
+    message: "Task starred successfully!",
+    status: "success",
+  });
+}
+
+// get deleted tasks. Deleted tasks are save like: category: "deleted", accepts userid for filter
+async function getDeletedTasks(req, res) {
+  const { userid } = req.params;
+
+  console.log("userId", userid);
+
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef
+    .where("userId", "==", userid)
+    .where("category", "==", "deleted")
+    .get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No Deleted tasks Found!",
+      status: "error",
+    });
+  }
+
+  let tasks = [];
+  snapshot.forEach((doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    tasks.push({ taskId, ...task });
+  });
+
+  res.status(200).json({
+    message: "Deleted Tasks fetched successfully!",
+    status: "success",
+    tasks: tasks,
+  });
+}
+
 module.exports = {
   createTask,
   getBoardTasks,
@@ -455,4 +553,7 @@ module.exports = {
   pinTask,
   unpinTask,
   getPinnedTasks,
+  getTasks,
+  starTask,
+  getDeletedTasks,
 };
