@@ -4,7 +4,7 @@ const controllers = require("./controllers/index");
 const taskRoutes = require("./routes/task.routes");
 const boardRoutes = require("./routes/board.routes");
 const userRoutes = require("./routes/auth.routes");
-const notificationRoutes = require("./routes/notification.routes");
+// const notificationRoutes = require("./routes/notification.routes");
 require("dotenv").config();
 
 const app = express();
@@ -53,7 +53,7 @@ app.use("/api", controllers);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/auth", userRoutes);
-app.use("/api/notifications", notificationRoutes);
+// app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 9090;
 
