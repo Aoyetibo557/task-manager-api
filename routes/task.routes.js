@@ -49,7 +49,19 @@ router.get("/gettasks/:userid", task.getTasks);
 // star a task
 router.put("/startask/:taskid", task.starTask);
 
+// unstar a task
+router.put("/unstartask/:taskid", task.unStarTask);
+
 // get deleted tasks
 router.get("/getdeletedtasks/:userid", task.getDeletedTasks);
+
+// add label to task
+router.get("/getdeletedtasks/:taskid", task.addLabelToTask);
+
+// remove label from task
+router.put("/removelabelfromtask/:taskid", task.removeLabelFromTask);
+
+// set due date for task
+router.put("/setduedate/:taskid", task.setDueDateForTask);
 
 module.exports = router;

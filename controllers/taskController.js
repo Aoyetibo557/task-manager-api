@@ -1,4 +1,4 @@
-const { db } = require("../services/useAuth.js");
+const { db, admin } = require("../services/useAuth.js");
 const dayjs = require("dayjs");
 
 async function createTask(req, res) {
@@ -17,7 +17,8 @@ async function createTask(req, res) {
     status,
     boardId,
     userId,
-    category: "active",
+    category: "",
+    isActive: true,
     timestamp: dayjs().unix(),
     pinned: false,
   };
@@ -53,7 +54,7 @@ async function getBoardTasks(req, res) {
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("boardId", "==", boardid)
-    .where("category", "==", "active")
+    .where("isActive", "==", true)
     .get();
 
   if (snapshot.empty) {
@@ -84,7 +85,7 @@ async function getUserTasks(req, res) {
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("userId", "==", userid)
-    .where("category", "==", "active")
+    .where("isActive", "==", true)
     .get();
 
   if (snapshot.empty) {
@@ -124,8 +125,6 @@ async function updateTask(req, res) {
   // the data could be anything in the body, so we need to get the data from the body
   const data = req.body;
 
-  console.log("data", data);
-
   const taskRef = db.collection("tasks").doc(taskid);
   const taskData = await taskRef.get();
 
@@ -158,8 +157,8 @@ async function deleteTask(req, res) {
     });
   }
 
-  // delete should just update the category to deleted
-  await taskRef.update({ category: "deleted" });
+  // delete should just update the isActive to false
+  await taskRef.update({ isActive: false });
 
   res.status(200).json({
     message: "Task deleted successfully!",
@@ -315,7 +314,7 @@ async function getRecentTasks(req, res) {
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("userId", "==", userid)
-    .where("category", "==", "active")
+    .where("isActive", "==", true)
     .orderBy("timestamp", "asc")
     .limit(6)
     .get();
@@ -413,9 +412,9 @@ async function getPinnedTasks(req, res) {
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("userId", "==", userid)
-    .where("category", "==", "active")
+    .where("isActive", "==", true)
     .where("pinned", "==", true)
-    .orderBy("timestamp", "desc")
+    .orderBy("timestamp", "asc")
     .get();
 
   if (snapshot.empty) {
@@ -454,10 +453,10 @@ async function getTasks(req, res) {
           .where("userId", "==", userid)
           .where("pinned", "==", filter)
           .get()
-      : filterType === "category" &&
+      : filterType === "isActive" &&
         (await taskRef
           .where("userId", "==", userid)
-          .where("category", "==", filter)
+          .where("isActive", "==", true)
           .get());
 
   if (snapshot.empty) {
@@ -483,10 +482,9 @@ async function getTasks(req, res) {
   });
 }
 
-// handle starring a task, it takes in the task id and the user id and a boolean value for starred, if the boolean value is true, then it'll star the task, if it's false, then it'll unstar the task
+// handle starring a task, it takes in the task id and a boolean value for starred, if the boolean value is true, then it'll star the task, if it's false, then it'll unstar the task
 async function starTask(req, res) {
   const { taskid } = req.params;
-  const { isStarred } = req.body;
 
   const taskRef = db.collection("tasks").doc(taskid);
   const taskData = await taskRef.get();
@@ -498,10 +496,32 @@ async function starTask(req, res) {
     });
   }
 
-  await taskRef.update({ isStarred: isStarred });
+  await taskRef.update({ isStarred: true });
 
   res.status(200).json({
     message: "Task starred successfully!",
+    status: "success",
+  });
+}
+
+// handle starring a task, it takes in the task id and a boolean value for starred, if the boolean value is true, then it'll star the task, if it's false, then it'll unstar the task
+async function unStarTask(req, res) {
+  const { taskid } = req.params;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({ isStarred: false });
+
+  res.status(200).json({
+    message: "Task Unstarred successfully!",
     status: "success",
   });
 }
@@ -510,12 +530,10 @@ async function starTask(req, res) {
 async function getDeletedTasks(req, res) {
   const { userid } = req.params;
 
-  console.log("userId", userid);
-
   const taskRef = db.collection("tasks");
   const snapshot = await taskRef
     .where("userId", "==", userid)
-    .where("category", "==", "deleted")
+    .where("isActive", "==", false)
     .get();
 
   if (snapshot.empty) {
@@ -539,6 +557,107 @@ async function getDeletedTasks(req, res) {
   });
 }
 
+// add label to task
+async function addLabelToTask(req, res) {
+  const { taskid } = req.params;
+  const { label } = req.body;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  // labels is an array in the document
+  await taskRef.update({
+    labels: admin.firestore.FieldValue.arrayUnion(label),
+  });
+
+  res.status(200).json({
+    message: "Label added to task successfully!",
+    status: "success",
+  });
+}
+
+// remove label from task
+async function removeLabelFromTask(req, res) {
+  const { taskid } = req.params;
+  const { label } = req.body;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  // labels is an array in the document
+  await taskRef.update({
+    labels: admin.firestore.FieldValue.arrayRemove(label),
+  });
+
+  res.status(200).json({
+    message: "Label removed from task successfully!",
+    status: "success",
+  });
+}
+
+// set due date for task
+async function setDueDateForTask(req, res) {
+  const { taskid } = req.params;
+  const { dueDate } = req.body;
+
+  const taskRef = db.collection("tasks").doc(taskid);
+  const taskData = await taskRef.get();
+
+  if (!taskData.exists) {
+    return res.status(404).json({
+      message: "Task not found!",
+      status: "error",
+    });
+  }
+
+  await taskRef.update({
+    dueDate: dueDate,
+  });
+
+  res.status(200).json({
+    message: "Due date set for task successfully!",
+    status: "success",
+  });
+}
+
+// I need a method that would allow me to add a new field to all the documents in a collection
+async function addFieldToAllDocs(req, res) {
+  const taskRef = db.collection("tasks");
+  const snapshot = await taskRef.get();
+
+  if (snapshot.empty) {
+    return res.send({
+      message: "No tasks found!",
+      status: "error",
+    });
+  }
+
+  snapshot.forEach(async (doc) => {
+    const taskId = doc.id;
+    const task = doc.data();
+    await taskRef.doc(taskId).update({ pinned: false });
+  });
+
+  res.status(200).json({
+    message: "Field added to all tasks successfully!",
+    status: "success",
+  });
+}
+
 module.exports = {
   createTask,
   getBoardTasks,
@@ -555,5 +674,10 @@ module.exports = {
   getPinnedTasks,
   getTasks,
   starTask,
+  unStarTask,
   getDeletedTasks,
+  addLabelToTask,
+  removeLabelFromTask,
+  setDueDateForTask,
+  addFieldToAllDocs,
 };
