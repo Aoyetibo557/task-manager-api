@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500&display=swap" rel="stylesheet" />
+    <title>API Docs</title>
+
+    <style>
+        body {
+            /* background-color: #37323e; */
+            font-family: "Golos Text", sans-serif;
+            color: #37323e;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            height: 90px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: #f6ffff;
+            z-index: 100;
+        }
+        
+        .nav_links {
+            display: flex;
+            width: 30%;
+        }
+        
+        .header_logo {
+            font-size: 2.4rem;
+            /* color: #fff; */
+            font-family: "Bebas Neue", sans-serif;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        
+        .nav_link {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 100%;
+            list-style: none;
+            font-family: "Golos Text", sans-serif;
+            width: 20%;
+            text-decoration: none;
+            /* color: #fff; */
+        }
+        
+        .nav_link:hover {
+            text-decoration: underline;
+        }
+        /* Content container */
+        
+        .content-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: flex-start;
+            width: 100%;
+            height: 100%;
+            font-family: "Golos Text", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        /* Sidebar container */
+        
+        .sidebar {
+            width: 15vw;
+            height: 100%;
+            background-color: #333;
+            position: fixed;
+            top: 10%;
+            left: 0;
+            padding-top: 10px;
+        }
+        /* Sidebar links */
+        
+        .sidebar_links ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        /* Sidebar link items */
+        
+        .sidebar_links ul li {
+            padding: 10px 0;
+        }
+        
+        .sidebar_links ul li a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            padding: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar_links ul li a:hover {
+            background-color: #555;
+        }
+        /* Content section styling */
+        
+        .content-section {
+            max-width: 80%;
+            height: 100%;
+            padding: 20px;
+            background-color: #fff;
+            position: relative;
+            left: 280px;
+        }
+        
+        .content-section h2 {
+            color: #333;
+            /* Heading color */
+        }
+        
+        .content-section h3 {
+            color: #555;
+            /* Subheading color */
+        }
+        /* Paragraph styles within the content section */
+        
+        .content-section p {
+            color: #666;
+            /* Paragraph text color */
+            line-height: 1.5;
+            /* Adjust line height for better readability */
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h3 class="header_logo">Tassker API</h3>
+
+        <div class="nav_links">
+            <a class="nav_link" href="/">Docs</a>
+            <!-- searchbar -->
+        </div>
+    </header>
+    <section class="content-container">
+        <!-- container sidebar -->
+        <div class="sidebar">
+            <div class="sidebar_links">
+                <ul>
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#authentication">Authentication</a></li>
+                    <li><a href="#errors">Errors</a></li>
+                    <!-- <li><a href="#rate-limiting">Rate Limiting</a></li> -->
+                    <li><a href="#endpoints">Endpoints</a></li>
+                    <li><a href="#example">Example</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div id="introduction" class="content-section">
+                <h2>Introduction</h2>
+                <p>
+                    Welcome to the documentation for Tassker's REST API. This API provides various endpoints to interact with different features of the Tassker platform. Whether you are building integrations, automations, or accessing user data, this documentation will guide
+                    you through the available resources and best practices.
+                </p>
+
+                <h3>About Tassker</h3>
+                <p>
+                    Tassker is a platform designed to streamline task management, collaboration, and communication. Our API allows developers to extend the functionality of Tassker and integrate it seamlessly into their applications and workflows.
+                </p>
+
+                <h3>Getting Started</h3>
+                <p>
+                    To get started with the API, you'll need to understand the authentication process, handle potential errors, and explore the available endpoints. Refer to the links in the sidebar for more detailed information on each section.
+                </p>
+            </div>
+
+            <div id="authentication" class="content-section">
+                <h2>Authentication</h2>
+
+                <p>
+                    Authentication is to access protected resources in the Tassker API. Follow the steps below to authenticate your requests:
+                </p>
+
+                <h3>API Key Authentication ( coming soon!)</h3>
+                <p>
+                    Tassker does not use API key authentication as of yet. With the new updates, you will need to include your API key in the headers of your HTTP requests. Obtain your API key by navigating to your Tassker account settings.
+                </p>
+
+                <h3>Example Request:</h3>
+                <pre>
+                    <code>
+                        https://task-manager-api-dun.vercel.app/api/auth/finduser/{email}
+                    </code>
+                </pre>
+
+                <h3>Example Response:</h3>
+                <pre>
+                  <code>
+                    {
+                       "message": "User found successfully!",
+                        "status": "success",
+                        "user": {
+                            "age": "34",
+                            "country": "Westeros",
+                            "email": "jonstark@gmail.com",
+                            "firstName": "Jon",
+                            "lastName": "Stark",
+                            "isAdmin": false,
+                            "language": "old english",
+                            "timestamp": "1678131594",
+                            "tourTaken": "false",
+                            "tourtaken": false,
+                            "username": "jonstark",
+                            "phone": "N/A",
+                            "profileImage": "",
+                            "password": "",
+                            "id": "qEOE8JOtkTVmJ6GLjbPR"
+                    }
+                  </code>
+                </pre>
+
+                <h3>Additional Information</h3>
+                <p>
+                    Note some endpoints require specific authentication methods and oher data to return a value. Refer to the documentation for each endpoint to learn more
+                </p>
+            </div>
+
+            <div id="errors" class="content-section">
+                <h2>Errors</h2>
+
+                <p>
+                    Tassker API may return various HTTP status codes to indicate the result of a request. Below are some common error codes along with their meanings:
+                </p>
+
+                <!-- Error code 200 -->
+                <h3>Error 200: OK</h3>
+                <p>
+                    The request was successful. This status code generally indicates that the request was processed without any issues.
+                </p>
+
+                <!-- Error code 201 -->
+                <h3>Error 201: Created</h3>
+                <p>
+                    The resource was successfully created. This status code is often returned when creating a new resource.
+                </p>
+
+                <!-- Error code 400 -->
+                <h3>Error 400: Bad Request</h3>
+                <p>
+                    The request could not be understood or was missing required parameters. Check the request and try again.
+                </p>
+
+                <!-- Error code 404 -->
+                <h3>Error 404: Not Found</h3>
+                <p>
+                    The requested resource could not be found on the server. Verify the URL and try again.
+                </p>
+
+                <!-- Error code 401 -->
+                <h3>Error 401: Unauthorized</h3>
+                <p>
+                    Authentication is required, and the provided credentials are not valid. Make sure to include valid authentication details.
+                </p>
+
+                <!-- Error code 500 -->
+                <h3>Error 500: Internal Server Error</h3>
+                <p>
+                    An unexpected error occurred on the server. Please try again later or contact support if the issue persists.
+                </p>
+            </div>
+
+            <div id="endpoints" class="content-section">
+                <h2>Endpoints</h2>
+                <p>
+                    The Tassker API provides various endpoints to interact with different features of the platform. Below is a list of the available endpoints:
+                </p>
+
+                <h3>- Users/Auth</h3>
+                <p>
+                    The Users/Auth endpoint allows you to authenticate a user and return their information. This endpoint requires a valid email address and password or id to return a value.
+                </p>
+
+                <div>
+                    <h4>endpoints</h4>
+                    <ul>
+                        <li>
+                            POST
+                            <a href="https://task-manager-api-dun.vercel.app/api/auth/" target="_blan" ref="norefferer">
+                  /api/auth/signup</a
+                >
+              </li>
+              <li>
+                POST<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blan"
+                  ref="norefferer">
+                  /api/auth/login</a
+                >
+              </li>
+              <li>
+                GET<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/auth/finduser/{email}</a
+                >
+              </li>
+              <li>
+                PUT<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/auth/updateuser/{email}</a
+                >
+              </li>
+              <li>
+                PUT<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/auth/updateuserbyid/{userid}</a
+                >
+              </li>
+              <li>
+                PUT<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/auth/resetpassword/{userid}</a
+                >
+              </li>
+              <li>
+                GET<a
+                  href="https://task-manager-api-dun.vercel.app/api/auth/"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/auth/userstats/{userid}</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <h3>- Tasks</h3>
+          <p>
+            The Tasks endpoint allows you to create, update, and delete tasks.
+            This endpoint requires a valid user id to return a value.
+          </p>
+
+          <div>
+            <h4>endpoints</h4>
+            <ul>
+              <li>
+                POST
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/createtask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/createtask</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getboardtasks/{boardid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getboardtasks/{boardid}</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/updatetask/{taskid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/updatetask/{taskid}</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/deletetask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/deletetask</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/updatetaskstatus"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/updatetaskstatus</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/archiverask/{taskid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/archiverask/{taskid}</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getboardarchivedtasks/{boardid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getboardarchivedtasks/{boardid}</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getuserarchivedtasks/{userid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getuserarchivedtasks/{userid}</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getrecenttasks/{userid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getrecenttasks/{userid}</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/pintask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/pintask</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/unpintask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/unpintask</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getpinnedtasks"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getpinnedtasks</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getusertasks"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getusertasks</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/gettasks"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/gettasks</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/startask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/startask</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/unstartask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/unstartask</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getdeletedtasks/{userid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getdeletedtasks/{userid}</a
+                >
+              </li>
+              <li>
+                GET
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/getdeletedtasks/{taskid}"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/getdeletedtasks/{taskid}</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/removelabelfromtask"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/removelabelfromtask</a
+                >
+              </li>
+              <li>
+                PUT
+                <a
+                  href="https://task-manager-api-dun.vercel.app/api/tasks/setduedate"
+                  target="_blank"
+                  rel="norefferer">
+                  /api/tasks/setduedate</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <h3>- Boards</h3>
+          <p>
+            The Boards endpoint allows you to create, update, and delete boards.
+            This endpoint requires a valid user id to return a value.
+          </p>
+
+          <h4>endpoints</h4>
+
+          <ul>
+            <li>
+              POST
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/createboard"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/createboard</a
+              >
+            </li>
+            <li>
+              GET
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/getboard/{boardname}"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/getboard/{boardname}</a
+              >
+            </li>
+            <li>
+              GET
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/getuserboards/{userid}"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/getuserboards/{userid}</a
+              >
+            </li>
+            <li>
+              GET
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/getboardtaskscount/{boardid}"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/getboardtaskscount/{boardid}</a
+              >
+            </li>
+            <li>
+              PUT
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/cleartasks"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/cleartasks</a
+              >
+            </li>
+            <li>
+              DELETE
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/deleteboard"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/deleteboard</a
+              >
+            </li>
+            <li>
+              PUT
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/addcollaborator"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/addcollaborator</a
+              >
+            </li>
+            <li>
+              PUT
+              <a
+                href="https://task-manager-api-dun.vercel.app/api/boards/removecollaborator"
+                target="_blank"
+                rel="norefferer">
+                /api/boards/removecollaborator</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div id="example" class="content-section">
+          <h2>Example</h2>
+          <p>
+            The following is an example of a several requests and responses
+            using a test user.
+          </p>
+
+          <h4>Request</h4>
+          <pre>
+            <code>
+              POST /api/auth/login HTTP/1.1
+              Host: task-manager-api-dun.vercel.app
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "email": "jonstark@gmail.com",
+                "password": "password"
+              }
+            </code>
+          </pre>
+
+          <h4>Response</h4>
+          <pre>
+            <code>
+              HTTP/1.1 200 OK
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "message": "User found successfully!",
+                "status": "success",
+                "user": {
+                  "age": "34",
+                  "country": "Westeros",
+                  "email": "jonstark@gmail.com",
+                  "firstName": "Jon",
+                  "lastName": "Stark",
+                  "isAdmin": false,
+                  "language": "old english",
+                  "timestamp": "1678131594",
+                  "tourtaken": false,
+                  "username": "jonstark",
+                  "phone": "N/A",
+                  "profileImage": "",
+                  "password": "",
+                  "id": "qEOE8JOtkTVmJ6GLjbPR"
+                }
+              }
+            </code>
+          </pre>
+
+          <h4>Request</h4>
+          <pre>
+            <code>
+              GET /api/boards/getuserboards/qEOE8JOtkTVmJ6GLjbPR HTTP/1.1
+              Host: task-manager-api-dun.vercel.app
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "userid": "qEOE8JOtkTVmJ6GLjbPR"
+              }
+            </code>
+          </pre>
+
+          <h4>Response</h4>
+          <pre>
+            <code>
+              HTTP/1.1 200 OK
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "message": "User found successfully!",
+                "status": "success",
+                "boards":[
+                  {
+                    "name": "My Board",
+                    "id": "qEOE8JOtkTVmJ6GLjbPR",
+                    "status": "active",
+                  },
+                  {
+                    "name": "My Board 2",
+                    "id": "qEOE8JOtkTVmJ6GLjbPR",
+                    "status": "active",
+                  }
+                ]
+                "user": {
+                  "age": "34",
+                  "country": "Westeros",
+                  "email": "jonstark@gmail.com",
+                  ...,
+                }
+              }
+            </code>
+          </pre>
+
+          <h4>Request</h4>
+          <pre>
+            <code>
+              POST /api/tasks/createtask HTTP/1.1
+              Host: task-manager-api-dun.vercel.app
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "userid": "qEOE8JOtkTVmJ6GLjbPR",
+                "boardid": "...",
+                "taskname": "My Task",
+                "description": "This is my task",
+                "taskstatus": "active",
+                "duedate": "2021-09-01",
+                "labels": ["label1", "label2"]
+              }
+            </code>
+          </pre>
+
+          <h4>Response</h4>
+          <pre>
+            <code>
+              HTTP/1.1 200 OK
+              Content-Type: application/json
+              Content-Length: 60
+
+              {
+                "message": "Task created successfully!",
+                "status": "success",
+                "task": {
+                  "userid": "qEOE8JOtkTVmJ6GLjbPR",
+                  "boardid": "...",
+                  "taskname": "My Task",
+                  "taskdescription": "This is my task",
+                  "taskstatus": "active",
+                  "duedate": "2021-09-01",
+                  "labels": ["label1", "label2"],
+                  "taskid": "...",
+                  "timestamp": "1678131594",
+                }
+              }
+            </code>
+          </pre>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
