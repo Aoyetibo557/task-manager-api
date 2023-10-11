@@ -4,7 +4,9 @@ const controllers = require("./controllers/index");
 const taskRoutes = require("./routes/task.routes");
 const boardRoutes = require("./routes/board.routes");
 const userRoutes = require("./routes/auth.routes");
-// const notificationRoutes = require("./routes/notification.routes");
+const notificationRoutes = require("./routes/notification.routes");
+const fs = require("fs").promises;
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -35,23 +37,23 @@ app.use(function(req, res, next) {
     next();
 });
 
-const getRoutesForController = (controller) => {
-    return textRoutes[controller] || [];
-};
-
 // simple route
-app.get("/", (req, res) => {
-    const fs = require("fs");
-    const htmlContent = fs.readFileSync("./welcome.html", "utf8");
-
-    res.send(htmlContent);
+app.get("/", async(req, res) => {
+    try {
+        const filePath = path.join(__dirname, "welcome.html");
+        const htmlContent = await fs.readFile(filePath, "utf8");
+        res.send(htmlContent);
+    } catch (error) {
+        console.error("Error reading file:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 app.use("/api", controllers);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/auth", userRoutes);
-// app.use("/api/notifications", notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 9090;
 
