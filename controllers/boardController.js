@@ -98,7 +98,7 @@ async function getUserBoards(req, res) {
     const tasksRef = db.collection("tasks");
     const snapshot = await tasksRef
       .where("boardId", "==", boards[i].id)
-      .where("category", "==", "active")
+      .where("isActive", "==", true)
       .get();
 
     if (snapshot.empty) {
@@ -193,7 +193,7 @@ async function clearBoardTasks(req, res) {
   });
 
   // if the tasks are found and are already deleted, return a message
-  if (tasks.every((task) => task.category === "deleted")) {
+  if (tasks.every((task) => task.isActive === false)) {
     res.send({
       message: "Board is empty!",
       status: "error",
@@ -206,7 +206,7 @@ async function clearBoardTasks(req, res) {
     const { id, ...rest } = task;
     const updatedTask = {
       ...rest,
-      category: "deleted",
+      isActive: false,
     };
     await db.collection("tasks").doc(id).update(updatedTask);
   });
@@ -286,7 +286,7 @@ async function deleteBoard(req, res) {
       const { id, ...rest } = task;
       const updatedTask = {
         ...rest,
-        category: "deleted",
+        isActive: false,
       };
 
       await db.collection("tasks").doc(id).update(updatedTask);
