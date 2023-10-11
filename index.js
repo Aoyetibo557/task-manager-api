@@ -39,8 +39,6 @@ const getRoutesForController = (controller) => {
     return textRoutes[controller] || [];
 };
 
-// for you Anu, create a dummp profile so the api can be tested by those who go to look at it. make sure to put it up. Also build an html page that can be passed with all these as opposed to the json.
-
 // simple route
 app.get("/", (req, res) => {
     const fs = require("fs");
@@ -60,13 +58,5 @@ const PORT = process.env.PORT || 9090;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
-
-// if (PORT) {
-//   app.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}.`);
-//   });
-// } else {
-//   console.log("===== ERROR ====\nCREATE A .env FILE!\n===== /ERROR ====");
-// }
 
 module.exports = app;
